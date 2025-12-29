@@ -9,7 +9,7 @@ export default function Home() {
       {/* Split Layout: Left Content, Right 3D Scene */}
       <div className="flex h-full">
         {/* Left Side: Scrollable Content */}
-        <div className="w-1/2 overflow-y-auto scroll-container">
+        <div className="w-1/2 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {/* Section 1: Hero */}
           <section className="section-1 min-h-screen flex items-center justify-start px-12">
             <ScrollText
