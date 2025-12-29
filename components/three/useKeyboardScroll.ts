@@ -69,6 +69,9 @@ export function useKeyboardScroll({
       const innerOpacityProxy = createOpacityProxy(innerRef.current, 0);
       const pcbBaseOpacityProxy = createOpacityProxy(pcbBaseRef.current, 0);
 
+      // Get the scroll container element for custom scroller
+      const scrollContainer = document.querySelector(".scroll-container") as HTMLElement;
+      
       // Create master timeline
       const masterTimeline = gsap.timeline({
         scrollTrigger: {
@@ -77,6 +80,7 @@ export function useKeyboardScroll({
           end: "bottom bottom",
           scrub: 1,
           pin: false,
+          scroller: scrollContainer || window,
         },
       });
 
@@ -87,6 +91,7 @@ export function useKeyboardScroll({
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          scroller: scrollContainer || window,
         },
       });
 
@@ -110,6 +115,7 @@ export function useKeyboardScroll({
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          scroller: scrollContainer || window,
         },
       });
 
@@ -184,6 +190,7 @@ export function useKeyboardScroll({
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          scroller: scrollContainer || window,
         },
       });
 
@@ -293,6 +300,7 @@ export function useKeyboardScroll({
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          scroller: scrollContainer || window,
         },
       });
 
@@ -356,6 +364,7 @@ export function useKeyboardScroll({
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          scroller: scrollContainer || window,
         },
       });
 

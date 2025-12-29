@@ -82,7 +82,7 @@ function SceneContent() {
 
 export function KeyboardScene() {
   return (
-    <div className="fixed inset-0 z-0">
+    <div className="w-full h-full">
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}

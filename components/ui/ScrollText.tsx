@@ -67,7 +67,7 @@ export function ScrollText({
   }, [section]);
 
   return (
-    <div className={`flex flex-col items-center justify-center ${className}`}>
+    <div className={`flex flex-col ${className}`}>
       <h2
         ref={titleRef}
         className="text-5xl md:text-7xl font-bold text-white mb-4 opacity-0"
@@ -77,7 +77,7 @@ export function ScrollText({
       {description && (
         <p
           ref={descRef}
-          className="text-xl md:text-2xl text-zinc-300 max-w-2xl text-center opacity-0"
+          className="text-xl md:text-2xl text-zinc-300 max-w-2xl opacity-0"
         >
           {description}
         </p>
