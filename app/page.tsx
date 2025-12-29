@@ -5,11 +5,11 @@ import { ScrollText } from "@/components/ui/ScrollText";
 
 export default function Home() {
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden bg-linear-to-br from-slate-50 via-gray-50 to-zinc-100">
       {/* Split Layout: Left Content, Right 3D Scene */}
       <div className="flex h-full">
         {/* Left Side: Scrollable Content */}
-        <div className="w-1/2 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="w-1/2 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-linear-to-b from-white/80 to-slate-50/80 backdrop-blur-sm">
           {/* Section 1: Hero */}
           <section className="section-1 min-h-screen flex items-center justify-start px-12">
             <ScrollText

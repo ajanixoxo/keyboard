@@ -5,6 +5,7 @@ import { PerspectiveCamera, Group } from "three";
 import { Suspense, useRef, useEffect, RefObject } from "react";
 import { ContactShadows } from "@react-three/drei";
 import { KeyboardModels } from "./KeyboardModels";
+import { OrbitControls } from "@react-three/drei";
 
 function SceneContent() {
   const { camera } = useThree();
@@ -21,6 +22,15 @@ function SceneContent() {
 
   return (
     <>
+      <OrbitControls
+      enableZoom={true}
+      enablePan={true}
+      enableRotate={true}
+      minDistance={1}
+      maxDistance={5}
+      autoRotate={false} // Set to true for auto-rotation
+      autoRotateSpeed={1}
+    />
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
       <directionalLight position={[-10, -10, -5]} intensity={0.5} />
@@ -47,7 +57,7 @@ export function KeyboardScene() {
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
         camera={{ position: [0, 1, 2], fov: 50 }}
-        className="bg-linear-to-b from-zinc-900 to-black"
+        className="bg-linear-to-br from-slate-100 via-gray-50 to-zinc-100"
       >
         <Suspense fallback={null}>
           <SceneContent />
