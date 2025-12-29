@@ -1,8 +1,8 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { PerspectiveCamera, Group } from "three";
-import { Suspense, useRef, useEffect } from "react";
+import { PerspectiveCamera, Group, Mesh } from "three";
+import { Suspense, useRef, useEffect, RefObject } from "react";
 import { ContactShadows } from "@react-three/drei";
 import { KeyboardModels } from "./KeyboardModels";
 import { useKeyboardScroll } from "./useKeyboardScroll";
@@ -20,7 +20,7 @@ function SceneContent() {
     if (camera instanceof PerspectiveCamera) {
       cameraRef.current = camera;
       camera.position.set(0, 0, 5);
-      camera.fov = 50;
+      cameraRef.current.fov = 50;
       camera.updateProjectionMatrix();
     }
   }, [camera]);
@@ -30,9 +30,9 @@ function SceneContent() {
     const setupMaterial = (group: Group | null, defaultOpacity: number) => {
       if (!group) return;
       group.traverse((child) => {
-        if ((child as any).isMesh && (child as any).material) {
-          const material = (child as any).material;
-          if (!material.transparent) {
+        if ((child as Mesh).isMesh && (child as Mesh).material) {
+          const material = (child as Mesh).material;
+          if (!Array.isArray(material) && !material.transparent) {
             material.transparent = true;
             material.opacity = defaultOpacity;
           }
@@ -49,10 +49,10 @@ function SceneContent() {
   // Setup scroll-controlled animations
   useKeyboardScroll({
     camera: cameraRef,
-    fullRef,
-    keysRef,
-    innerRef,
-    pcbBaseRef,
+    fullRef: fullRef as RefObject<Group>,
+    keysRef: keysRef as RefObject<Group>,
+    innerRef: innerRef as RefObject<Group>,
+    pcbBaseRef: pcbBaseRef as RefObject<Group>,
   });
 
   return (
@@ -63,10 +63,10 @@ function SceneContent() {
       <pointLight position={[0, 0, 5]} intensity={0.5} />
       
       <KeyboardModels
-        fullRef={fullRef}
-        keysRef={keysRef}
-        innerRef={innerRef}
-        pcbBaseRef={pcbBaseRef}
+        fullRef={fullRef as RefObject<Group>}
+        keysRef={keysRef as RefObject<Group>}
+        innerRef={innerRef as RefObject<Group>  }
+        pcbBaseRef={pcbBaseRef as RefObject<Group>}
       />
       
       <ContactShadows
@@ -87,7 +87,7 @@ export function KeyboardScene() {
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
         camera={{ position: [0, 0, 5], fov: 50 }}
-        className="bg-gradient-to-b from-zinc-900 to-black"
+        className="bg-linear-to-b from-zinc-900 to-black"
       >
         <Suspense fallback={null}>
           <SceneContent />
