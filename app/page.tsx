@@ -9,7 +9,7 @@ export default function Home() {
       {/* Split Layout: Left Content, Right 3D Scene */}
       <div className="flex h-full">
         {/* Left Side: Scrollable Content */}
-        <div className="w-1/2 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-linear-to-b from-white/80 to-slate-50/80 backdrop-blur-sm">
+        <div className="w-2/5 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-linear-to-b from-white/80 to-slate-50/80 backdrop-blur-sm">
           {/* Section 1: Hero */}
           <section className="section-1 min-h-screen flex items-center justify-start px-12">
             <ScrollText
@@ -62,7 +62,7 @@ export default function Home() {
         </div>
 
         {/* Right Side: Fixed 3D Scene */}
-        <div className="w-1/2 fixed right-0 top-0 h-full">
+        <div className="w-3/5 fixed right-0 top-0 h-full">
           <KeyboardScene />
         </div>
       </div>

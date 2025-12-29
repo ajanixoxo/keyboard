@@ -10,12 +10,15 @@ import { OrbitControls } from "@react-three/drei";
 function SceneContent() {
   const { camera } = useThree();
   const fullRef = useRef<Group>(null);
+  const keysRef = useRef<Group>(null);
+  const innerRef = useRef<Group>(null);
+  const pcbBaseRef = useRef<Group>(null);
 
   // Ensure camera is PerspectiveCamera and set initial position
   useEffect(() => {
     if (camera instanceof PerspectiveCamera) {
-      camera.position.set(0, 1, 2);
-      camera.lookAt(0, 0, 0);
+      camera.position.set(0, 0, -3);
+      // camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
     }
   }, [camera]);
@@ -37,6 +40,9 @@ function SceneContent() {
       
       <KeyboardModels
         fullRef={fullRef as RefObject<Group>}
+        keysRef={keysRef as RefObject<Group>}
+        innerRef={innerRef as RefObject<Group>}
+        pcbBaseRef={pcbBaseRef as RefObject<Group>}
       />
       
       <ContactShadows
@@ -56,7 +62,7 @@ export function KeyboardScene() {
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
-        camera={{ position: [0, 1, 2], fov: 50 }}
+        camera={{ position: [0, 0, -3], fov: 50 }}
         className="bg-linear-to-br from-slate-100 via-gray-50 to-zinc-100"
       >
         <Suspense fallback={null}>
