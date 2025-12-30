@@ -7,13 +7,19 @@ import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { KeyboardModels } from "./KeyboardModels";
 import { useKeyboardScroll } from "./useKeyboardScroll";
 
-function SceneContent() {
+function SceneContent({
+  keysRef,
+  innerRef,
+  pcbBaseRef,
+  fullRef,
+}: {
+  keysRef: RefObject<THREE.Group>;
+  innerRef: RefObject<THREE.Group>;
+  pcbBaseRef: RefObject<THREE.Group>;
+  fullRef: RefObject<THREE.Group>;
+}) {
   const { camera } = useThree();
   const cameraRef = useRef<THREE.PerspectiveCamera>(camera as THREE.PerspectiveCamera);
-  const fullRef = useRef<THREE.Group>(null);
-  const keysRef = useRef<THREE.Group>(null);
-  const innerRef = useRef<THREE.Group>(null);
-  const pcbBaseRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
@@ -36,7 +42,6 @@ function SceneContent() {
     innerRef: innerRef as RefObject<THREE.Group>,
     pcbBaseRef: pcbBaseRef as RefObject<THREE.Group>,
   });
-
 
   return (
     <>
@@ -92,7 +97,58 @@ function SceneContent() {
   );
 }
 
-export function KeyboardScene() {
+function SceneContentWrapper({
+  keysRef,
+  innerRef,
+  pcbBaseRef,
+  fullRef,
+  onCameraChange,
+  onGlChange,
+}: {
+  keysRef: RefObject<THREE.Group>;
+  innerRef: RefObject<THREE.Group>;
+  pcbBaseRef: RefObject<THREE.Group>;
+  fullRef: RefObject<THREE.Group>;
+  onCameraChange: (camera: THREE.PerspectiveCamera) => void;
+  onGlChange: (gl: THREE.WebGLRenderer) => void;
+}) {
+  const { camera, gl } = useThree();
+
+  // Update context state in useEffect
+  useEffect(() => {
+    if (camera instanceof THREE.PerspectiveCamera) {
+      onCameraChange(camera);
+    }
+    if (gl instanceof THREE.WebGLRenderer) {
+      onGlChange(gl);
+    }
+  }, [camera, gl, onCameraChange, onGlChange]);
+
+  return (
+    <SceneContent
+      keysRef={keysRef}
+      innerRef={innerRef}
+      pcbBaseRef={pcbBaseRef}
+      fullRef={fullRef}
+    />
+  );
+}
+
+export function KeyboardScene({
+  keysRef,
+  innerRef,
+  pcbBaseRef,
+  fullRef,
+  onCameraChange,
+  onGlChange,
+}: {
+  keysRef: RefObject<THREE.Group>;
+  innerRef: RefObject<THREE.Group>;
+  pcbBaseRef: RefObject<THREE.Group>;
+  fullRef: RefObject<THREE.Group>;
+  onCameraChange: (camera: THREE.PerspectiveCamera) => void;
+  onGlChange: (gl: THREE.WebGLRenderer) => void;
+}) {
   // GSAP ScrollTrigger handles all scroll animations
 
   return (
@@ -105,7 +161,14 @@ export function KeyboardScene() {
         className="bg-linear-to-br from-slate-100 via-gray-50 to-zinc-100"
       >
         <Suspense fallback={null}>
-          <SceneContent />
+          <SceneContentWrapper
+            keysRef={keysRef as RefObject<THREE.Group>}
+            innerRef={innerRef as RefObject<THREE.Group>}
+            pcbBaseRef={pcbBaseRef as RefObject<THREE.Group>}
+            fullRef={fullRef as RefObject<THREE.Group>}
+            onCameraChange={onCameraChange}
+            onGlChange={onGlChange}
+          />
         </Suspense>
       </Canvas>
     </div>

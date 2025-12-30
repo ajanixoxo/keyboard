@@ -20,7 +20,16 @@ function setGroupOpacity(group: Group | null, opacity: number) {
   if (!group) return;
   group.traverse((child) => {
     if ((child as Mesh).isMesh && (child as Mesh).material) {
-      (child as Mesh).material.opacity = opacity as number;
+      const material = (child as Mesh).material;
+      if (Array.isArray(material)) {
+        material.forEach((mat) => {
+          if (mat && 'opacity' in mat) {
+            mat.opacity = opacity;
+          }
+        });
+      } else if (material && 'opacity' in material) {
+        material.opacity = opacity;
+      }
     }
   });
 }

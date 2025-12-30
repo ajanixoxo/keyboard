@@ -1,7 +1,8 @@
 "use client";
 
-import { KeyboardScene } from "@/components/three/KeyboardScene";
+import { KeyboardSceneWrapper } from "@/components/three/KeyboardSceneWrapper";
 import { ScrollText } from "@/components/ui/ScrollText";
+import { PartDescriptions } from "@/components/ui/PartDescriptions";
 
 export default function Home() {
   return (
@@ -31,12 +32,29 @@ export default function Home() {
           </section>
 
           {/* Section 3: Internal Layout - Exploded Start */}
-          <section className="section-3 min-h-screen flex items-center justify-start px-12">
+          <section className="section-3 min-h-screen flex flex-col justify-center px-12 gap-12">
             <ScrollText
               section={3}
               title="Internal Architecture"
               description="Discover the intricate layers beneath the surface"
               className="text-left items-start"
+            />
+            <PartDescriptions
+              parts={[
+                {
+                  label: "Keycaps",
+                  description: "Premium double-shot PBT keycaps with custom legends for durability and clarity",
+                },
+                {
+                  label: "Switch Plate",
+                  description: "Rigid aluminum plate providing structural integrity and consistent key feel",
+                },
+                {
+                  label: "PCB Base",
+                  description: "Advanced circuit board with RGB backlighting and hot-swappable switch support",
+                },
+              ]}
+              className="mt-8"
             />
           </section>
 
@@ -63,7 +81,7 @@ export default function Home() {
 
         {/* Right Side: Fixed 3D Scene */}
         <div className="w-3/5 fixed right-0 top-0 h-full">
-          <KeyboardScene />
+          <KeyboardSceneWrapper />
         </div>
       </div>
     </div>
