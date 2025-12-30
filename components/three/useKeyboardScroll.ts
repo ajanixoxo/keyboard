@@ -501,7 +501,81 @@ export function useKeyboardScroll({
             }, 0
           );
 
-        // Section 4: Fully Exploded
+        // Transition: Section 3 to Section 4 (slide keys and inner out, bring PCB closer)
+        const transition3to4 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-4",
+            start: "top bottom", // Start when section 4 enters viewport
+            end: "top top", // Complete when section 4 reaches top
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
+
+        transition3to4
+          // Keys slide out of view (move far left)
+          .to(
+            keysRef.current.position,
+            {
+              x: -6, y: 0.6, z: 0.5, duration: 1, ease: "power2.out", // Slide out to the left
+            }, 0
+          )
+          .to(
+            keysOpacityProxy,
+            {
+              value: 0, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
+            }, 0
+          )
+          // Inner slide out of view (move far right)
+          .to(
+            innerRef.current.position,
+            {
+              x: 6, y: 0.3, z: 0.5, duration: 1, ease: "power2.out", // Slide out to the right
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 0, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          // PCB moves closer to camera and centers
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 0, y: 0, z: 0.2, duration: 1, ease: "power2.out", // Move closer to camera
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 1, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          )
+          // Camera moves closer to PCB to focus on backlit keyboard
+          .to(
+            camera.current.position,
+            {
+              x: -0.1158, y: 1.2, z: 2.5, duration: 1, ease: "power2.out", // Move closer to PCB
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -0.3792, y: -0.02293, z: -0.0117, duration: 1, ease: "power2.out", // Keep camera rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0, 0.2); // Look at PCB position
+              },
+              duration: 1, ease: "power2.out",
+            }, 0
+          );
+
+        // Section 4: Backlit Keyboard Focus (PCB only)
         const section4 = gsap.timeline({
           scrollTrigger: {
             trigger: ".section-4",
@@ -512,58 +586,77 @@ export function useKeyboardScroll({
           },
         });
 
-      // Further separation and camera orbit
-      section4
-        .to(
-          keysRef.current.position,
-          {
-            y: 2.5,
-            x: 0,
-            z: 0.5,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          innerRef.current.position,
-          {
-            y: 0,
-            x: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          pcbBaseRef.current.position,
-          {
-            y: -2.5,
-            x: 0,
-            z: -0.5,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          camera.current.position,
-          {
-            z: 5,
-            y: 0.5,
-            x: 0.8,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          camera.current.rotation,
-          {
-            x: -0.1,
-            y: 0.2,
-            z: 0,
-            duration: 1,
-          },
-          0
-        );
+        // Maintain PCB focus state
+        section4
+          .to(
+            keysRef.current.position,
+            {
+              x: -6, y: 0.6, z: 0.5, duration: 1, // Keep keys out of view
+            }, 0
+          )
+          .to(
+            keysOpacityProxy,
+            {
+              value: 0, duration: 0.1, onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            innerRef.current.position,
+            {
+              x: 6, y: 0.3, z: 0.5, duration: 1, // Keep inner out of view
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 0, duration: 0.1, onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 0, y: 0, z: 0.2, duration: 1, // Keep PCB close to camera
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.rotation,
+            {
+              x: 0.001, y: 0, z: 0, duration: 1, // Keep PCB rotation
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, // Keep PCB scale
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            camera.current.position,
+            {
+              x: -0.1158, y: 1.2, z: 2.5, duration: 1, // Keep camera close to PCB
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -0.3792, y: -0.02293, z: -0.0117, duration: 1, // Keep camera rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0, 0.2); // Keep looking at PCB
+              },
+              duration: 1,
+            }, 0
+          );
 
         // Section 5: Reassemble
         const section5 = gsap.timeline({
