@@ -48,151 +48,256 @@ export function useKeyboardScroll({
     if (!camera.current) return;
 
     const ctx = gsap.context(() => {
-      // Initial camera setup
-      const initialCameraPos = { x: 0, y: 0, z: 5 };
-      const initialCameraRot = { x: 0, y: 0, z: 0 };
+      // Wait a bit for DOM and models to be ready
+      setTimeout(() => {
+        // Get the scroll container element for custom scroller
+        const scrollContainer = document.querySelector(".scroll-container") as HTMLElement;
+        
+        if (!scrollContainer) {
+          console.warn("Scroll container not found, animations may not work correctly");
+          return;
+        }
 
-      camera.current!.position.set(
-        initialCameraPos.x,
-        initialCameraPos.y,
-        initialCameraPos.z
-      );
-      camera.current!.rotation.set(
-        initialCameraRot.x,
-        initialCameraRot.y,
-        initialCameraRot.z
-      );
+        // Initial camera setup - use current camera position
+        const initialCameraPos = { x: -0.019, y: 2.690, z: 1.624 };
+        const initialCameraRot = { x: -1.175, y: -0.007, z: -0.016 };
 
-      // Create opacity proxies for material animation (used across multiple sections)
-      const fullOpacityProxy = createOpacityProxy(fullRef.current, 1);
-      const keysOpacityProxy = createOpacityProxy(keysRef.current, 0);
-      const innerOpacityProxy = createOpacityProxy(innerRef.current, 0);
-      const pcbBaseOpacityProxy = createOpacityProxy(pcbBaseRef.current, 0);
-
-      // Get the scroll container element for custom scroller
-      const scrollContainer = document.querySelector(".scroll-container") as HTMLElement;
-      
-      // Create master timeline
-      const masterTimeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".scroll-container",
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-          pin: false,
-          scroller: scrollContainer || window,
-        },
-      });
-
-      // Section 1: Hero (0% - 20% of scroll)
-      const section1 = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".section-1",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          scroller: scrollContainer || window,
-        },
-      });
-
-      section1
-        .fromTo(
-          camera.current.position,
-          { z: 6, y: 0, x: 0 },
-          { z: 5, y: 0, x: 0, duration: 1 }
-        )
-        .fromTo(
-          camera.current.rotation,
-          { x: 0, y: 0, z: 0 },
-          { x: 0, y: 0, z: 0, duration: 1 },
-          0
+        camera.current!.position.set(
+          initialCameraPos.x,
+          initialCameraPos.y,
+          initialCameraPos.z
         );
-
-      // Section 2: Keys Focus (20% - 40% of scroll)
-      const section2 = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".section-2",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          scroller: scrollContainer || window,
-        },
-      });
-
-      section2
-        .to(camera.current.position, {
-          z: 3,
-          y: 0.5,
-          x: 0,
-          duration: 1,
-        })
-        .to(
-          camera.current.rotation,
-          {
-            x: -0.1,
-            y: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          fullOpacityProxy,
-          {
-            value: 0.3,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(fullRef.current, fullOpacityProxy.value),
-          },
-          0
-        )
-        .to(
-          keysOpacityProxy,
-          {
-            value: 1,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
-          },
-          0
-        )
-        .to(
-          keysRef.current.scale,
-          {
-            x: 1.1,
-            y: 1.1,
-            z: 1.1,
-            duration: 0.5,
-          },
-          0
-        )
-        .to(
-          innerOpacityProxy,
-          {
-            value: 0.2,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
-          },
-          0
-        )
-        .to(
-          pcbBaseOpacityProxy,
-          {
-            value: 0.2,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
-          },
-          0
+        camera.current!.rotation.set(
+          initialCameraRot.x,
+          initialCameraRot.y,
+          initialCameraRot.z
         );
+        camera.current!.lookAt(0, 0.1, 0.1);
+        camera.current!.updateProjectionMatrix();
 
-      // Section 3: Internal Layout - Exploded Start (40% - 60% of scroll)
-      const section3 = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".section-3",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          scroller: scrollContainer || window,
-        },
-      });
+        // Set initial model positions to match KeyboardModels.tsx
+        if (keysRef.current) {
+          keysRef.current.position.set(0, 0, 0.8);
+          keysRef.current.scale.set(0.02, 0.02, 0.02);
+          keysRef.current.rotation.set(1.3, 0, 0);
+        }
+        if (innerRef.current) {
+          innerRef.current.position.set(0, 0, 0.5);
+          innerRef.current.scale.set(0.02, 0.02, 0.02);
+          innerRef.current.rotation.set(1.3, 0, 0);
+        }
+        if (pcbBaseRef.current) {
+          pcbBaseRef.current.position.set(0, -0.2, 0.55);
+          pcbBaseRef.current.scale.set(0.02, 0.02, 0.02);
+          pcbBaseRef.current.rotation.set(0.001, 0, 0);
+        }
+
+        // Create opacity proxies for material animation
+        // All models start visible (opacity 1) since they're assembled
+        const keysOpacityProxy = createOpacityProxy(keysRef.current, 1);
+        const innerOpacityProxy = createOpacityProxy(innerRef.current, 1);
+        const pcbBaseOpacityProxy = createOpacityProxy(pcbBaseRef.current, 1);
+
+        // Section 1: Hero - Keep camera steady, all models visible
+        const section1 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-1",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
+
+        section1
+          .to(camera.current.position, {
+            x: initialCameraPos.x,
+            y: initialCameraPos.y,
+            z: initialCameraPos.z,
+            duration: 0.1,
+          })
+          .to(
+            camera.current.rotation,
+            {
+              x: initialCameraRot.x,
+              y: initialCameraRot.y,
+              z: initialCameraRot.z,
+              duration: 0.1,
+            },
+            0
+          )
+          // Ensure all models are visible and at correct positions
+          .to(
+            keysRef.current.position,
+            {
+              x: 0, y: 0, z: 0.8, duration: 0.1,
+            }, 0
+          )
+          .to(
+            keysRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 0.1,
+            }, 0
+          )
+          .to(
+            innerRef.current.position,
+            {
+              x: 0, y: 0, z: 0.5, duration: 0.1,
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 0, y: -0.2, z: 0.55, duration: 0.1,
+            }, 0
+          )
+          .to(
+            keysOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          );
+
+        // Transition: Section 1 to Section 2 (separation animation)
+        const transition1to2 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-1",
+            start: "bottom top",
+            end: "bottom center",
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
+
+        transition1to2
+          // Inner layer moves outward (left) and fades out
+          .to(
+            innerRef.current.position,
+            {
+              x: -2, y: 0, z: 0.5, duration: 1, ease: "power2.out",
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 0, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          // PCB Base moves outward (right) and fades out
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 2, y: -0.2, z: 0.55, duration: 1, ease: "power2.out",
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 0, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          )
+          // Keys stay visible, scale up and move forward
+          .to(
+            keysRef.current.position,
+            {
+              x: 0, y: 0, z: 0.3, duration: 1, ease: "power2.out", // Move forward (closer to camera)
+            }, 0
+          )
+          .to(
+            keysRef.current.scale,
+            {
+              x: 0.03, y: 0.03, z: 0.03, duration: 1, ease: "power2.out", // Scale up from 0.02 to 0.03 (50% larger)
+            }, 0
+          )
+          // Camera zooms in on keycaps
+          .to(
+            camera.current.position,
+            {
+              x: -0.019, y: 0.3, z: -2, duration: 1, ease: "power2.out", // Move closer
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -0.1, y: -0.007, z: -0.016, duration: 1, ease: "power2.out", // Adjust rotation to look at keycaps
+            }, 0
+          );
+
+        // Section 2: Keycaps Focus (only keycaps visible, scaled up)
+        const section2 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-2",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
+
+        // Maintain keycaps focus state
+        section2
+          .to(keysRef.current.position, {
+            x: 0, y: 0, z: 0.3, duration: 1,
+          })
+          .to(
+            keysRef.current.scale,
+            {
+              x: 0.03, y: 0.03, z: 0.03, duration: 1,
+            }, 0
+          )
+          .to(
+            camera.current.position,
+            {
+              x: -0.019, y: 0.3, z: -2, duration: 1,
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -0.1, y: -0.007, z: -0.016, duration: 1,
+            }, 0
+          )
+          .to(
+            keysOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 0, duration: 0.1, onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 0, duration: 0.1, onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          );
+
+        // Section 3: Internal Layout - Exploded Start
+        const section3 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-3",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
 
       // Gradual separation - starts at section start, completes at midpoint
       section3
@@ -247,15 +352,6 @@ export function useKeyboardScroll({
           0
         )
         .to(
-          fullOpacityProxy,
-          {
-            value: 0,
-            duration: 0.3,
-            onUpdate: () => setGroupOpacity(fullRef.current, fullOpacityProxy.value),
-          },
-          0
-        )
-        .to(
           keysOpacityProxy,
           {
             value: 1,
@@ -293,16 +389,16 @@ export function useKeyboardScroll({
           0
         );
 
-      // Section 4: Fully Exploded (60% - 80% of scroll)
-      const section4 = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".section-4",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          scroller: scrollContainer || window,
-        },
-      });
+        // Section 4: Fully Exploded
+        const section4 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-4",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
 
       // Further separation and camera orbit
       section4
@@ -357,16 +453,16 @@ export function useKeyboardScroll({
           0
         );
 
-      // Section 5: Reassemble (80% - 100% of scroll)
-      const section5 = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".section-5",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          scroller: scrollContainer || window,
-        },
-      });
+        // Section 5: Reassemble
+        const section5 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-5",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
 
       section5
         .to(
@@ -420,15 +516,6 @@ export function useKeyboardScroll({
           0
         )
         .to(
-          fullOpacityProxy,
-          {
-            value: 1,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(fullRef.current, fullOpacityProxy.value),
-          },
-          0.5
-        )
-        .to(
           keysOpacityProxy,
           {
             value: 0,
@@ -456,7 +543,8 @@ export function useKeyboardScroll({
           0.5
         );
 
-      timelineRef.current = masterTimeline;
+        timelineRef.current = section1;
+      }, 200); // Small delay to ensure DOM and models are ready
     });
 
     return () => {
