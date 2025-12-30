@@ -71,6 +71,7 @@ export function ScrollText({
       <h2
         ref={titleRef}
         className="text-5xl md:text-7xl font-bold text-slate-900 mb-4 opacity-0"
+        style={{ fontFamily: 'var(--font-audiowide)' }}
       >
         {title}
       </h2>

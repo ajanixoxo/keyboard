@@ -22,9 +22,16 @@
 body {
   background: #f8fafc;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
 }
 
+h1,h2,h3,h4,h5,h6{
+  font-family: var(--font-audiowide);
+}
+
+p{
+  font-family: var(--font-geist-sans);
+}
 /* Hide scrollbar for webkit browsers */
 .scroll-container::-webkit-scrollbar {
   display: none;

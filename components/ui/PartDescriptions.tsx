@@ -69,8 +69,9 @@ export function PartDescriptions({
               ref={(el) => {
                 labelRefs.current[index] = el;
               }}
-              className="text-2xl font-semibold text-slate-800 font-mono part-label"
+              className="text-2xl font-semibold text-slate-800 part-label"
               data-part-index={index}
+              style={{ fontFamily: 'var(--font-audiowide)' }}
             >
               {part.label}
             </h3>

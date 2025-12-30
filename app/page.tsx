@@ -3,10 +3,14 @@
 import { KeyboardSceneWrapper } from "@/components/three/KeyboardSceneWrapper";
 import { ScrollText } from "@/components/ui/ScrollText";
 import { PartDescriptions } from "@/components/ui/PartDescriptions";
+import { Navbar } from "@/components/ui/Navbar";
+import { MadeBy } from "@/components/ui/MadeBy";
 
 export default function Home() {
   return (
     <div className="relative w-full h-screen overflow-hidden bg-linear-to-br from-slate-50 via-gray-50 to-zinc-100">
+      <Navbar />
+      <MadeBy />
       {/* Split Layout: Left Content, Right 3D Scene */}
       <div className="flex h-full">
         {/* Left Side: Scrollable Content */}
