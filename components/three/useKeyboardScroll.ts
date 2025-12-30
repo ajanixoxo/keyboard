@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Group, PerspectiveCamera } from "three";
+import { Group, Mesh, PerspectiveCamera } from "three";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,8 +19,8 @@ interface UseKeyboardScrollProps {
 function setGroupOpacity(group: Group | null, opacity: number) {
   if (!group) return;
   group.traverse((child) => {
-    if ((child as any).isMesh && (child as any).material) {
-      (child as any).material.opacity = opacity;
+    if ((child as Mesh).isMesh && (child as Mesh).material) {
+      (child as Mesh).material.opacity = opacity as number;
     }
   });
 }
@@ -102,8 +102,8 @@ export function useKeyboardScroll({
         const section1 = gsap.timeline({
           scrollTrigger: {
             trigger: ".section-1",
-            start: "top top",
-            end: "bottom top",
+            start: "center center",
+            end: "center center",
             scrub: 1,
             scroller: scrollContainer,
           },
@@ -171,22 +171,23 @@ export function useKeyboardScroll({
           );
 
         // Transition: Section 1 to Section 2 (separation animation)
+        // This happens as user scrolls from section 1 into section 2
         const transition1to2 = gsap.timeline({
           scrollTrigger: {
-            trigger: ".section-1",
-            start: "bottom top",
-            end: "bottom center",
+            trigger: ".section-2",
+            start: "top bottom", // Start when section 2 enters viewport
+            end: "center center", // Complete when section 2 reaches top
             scrub: 1,
             scroller: scrollContainer,
           },
         });
 
         transition1to2
-          // Inner layer moves outward (left) and fades out
+          // Inner layer moves outward (left) horizontally and fades out
           .to(
             innerRef.current.position,
             {
-              x: -2, y: 0, z: 0.5, duration: 1, ease: "power2.out",
+              x: 0, y: -4, z: 0.5, duration: 1, ease: "power2.out", // Move further left
             }, 0
           )
           .to(
@@ -195,11 +196,11 @@ export function useKeyboardScroll({
               value: 0, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
             }, 0
           )
-          // PCB Base moves outward (right) and fades out
+          // PCB Base moves outward (right) horizontally and fades out
           .to(
             pcbBaseRef.current.position,
             {
-              x: 2, y: -0.2, z: 0.55, duration: 1, ease: "power2.out",
+              x: -0.2, y: 0, z: -4, duration: 1, ease: "power2.out", // Move further right
             }, 0
           )
           .to(
@@ -208,65 +209,90 @@ export function useKeyboardScroll({
               value: 0, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
             }, 0
           )
-          // Keys stay visible, scale up and move forward
+          // Keys stay in same X/Y position but move closer to camera and rotate to face up (top view)
           .to(
             keysRef.current.position,
             {
-              x: 0, y: 0, z: 0.3, duration: 1, ease: "power2.out", // Move forward (closer to camera)
+              x: 0, y: 0, z: 0.08, duration: 1, ease: "power2.out", // Move closer to camera
             }, 0
           )
+         
           .to(
             keysRef.current.scale,
             {
-              x: 0.03, y: 0.03, z: 0.03, duration: 1, ease: "power2.out", // Scale up from 0.02 to 0.03 (50% larger)
+              x: 0.065, y: 0.065, z: 0.065, duration: 1, ease: "power2.out", // Scale up more (75% larger)
             }, 0
           )
-          // Camera zooms in on keycaps
+          // Camera moves to desired position for section 2
           .to(
             camera.current.position,
             {
-              x: -0.019, y: 0.3, z: -2, duration: 1, ease: "power2.out", // Move closer
+              x: -0.1158, y: 1.5606, z: 3.7654, duration: 1, ease: "power2.out", // Position camera at desired view
             }, 0
           )
           .to(
             camera.current.rotation,
             {
-              x: -0.1, y: -0.007, z: -0.016, duration: 1, ease: "power2.out", // Adjust rotation to look at keycaps
+              x: -0.3792, y: -0.02293, z: -0.0117, duration: 1, ease: "power2.out", // Set camera rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0.1, 0.1); // Look at the target position
+              },
+              duration: 1, ease: "power2.out",
             }, 0
           );
 
-        // Section 2: Keycaps Focus (only keycaps visible, scaled up)
+        // Section 2: Keycaps Focus (only keycaps visible, scaled up, top view)
         const section2 = gsap.timeline({
           scrollTrigger: {
             trigger: ".section-2",
-            start: "top top",
-            end: "bottom top",
+            start: "center center",
+            end: "center center",
             scrub: 1,
             scroller: scrollContainer,
           },
         });
 
-        // Maintain keycaps focus state
+        // Maintain keycaps focus state with top view (matches transition end positions)
         section2
           .to(keysRef.current.position, {
-            x: 0, y: 0, z: 0.3, duration: 1,
+            x: 0, y: 0, z: -0.2, duration: 1, // Keep keys close to camera
           })
+          .to(
+            keysRef.current.rotation,
+            {
+              x: 2, y: 0, z: 0, duration: 1, // Keep keys facing up (top view)
+            }, 0
+          )
           .to(
             keysRef.current.scale,
             {
-              x: 0.03, y: 0.03, z: 0.03, duration: 1,
+              x: 0.035, y: 0.035, z: 0.035, duration: 1, // Keep keys scaled up
             }, 0
           )
           .to(
             camera.current.position,
             {
-              x: -0.019, y: 0.3, z: -2, duration: 1,
+              x: -0.0078, y: 1.0755, z: 2.8328, duration: 1, // Keep camera at desired position
             }, 0
           )
           .to(
             camera.current.rotation,
             {
-              x: -0.1, y: -0.007, z: -0.016, duration: 1,
+              x: -0.3429, y: -0.0027, z: -0.0010, duration: 1, // Keep camera rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0.1, 0.1); // Keep looking at target position
+              },
+              duration: 1,
             }, 0
           )
           .to(
