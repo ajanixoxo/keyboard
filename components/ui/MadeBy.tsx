@@ -4,7 +4,7 @@ export function MadeBy() {
   return (
     <div className="fixed bottom-6 right-6 z-50">
       <a
-        href="https://adeoluwa.dev"
+        href="https://adeoluwagbenro.vercel.app"
         target="_blank"
         rel="noopener noreferrer"
         className="text-sm text-slate-600 hover:text-slate-900 transition-colors"

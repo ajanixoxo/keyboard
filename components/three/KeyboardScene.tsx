@@ -2,7 +2,7 @@
 
 import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Suspense, useRef, useEffect, RefObject } from "react";
+import { Suspense, useRef, useEffect, useState, RefObject } from "react";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { KeyboardModels } from "./KeyboardModels";
 import { useKeyboardScroll } from "./useKeyboardScroll";
@@ -20,6 +20,7 @@ function SceneContent({
 }) {
   const { camera } = useThree();
   const cameraRef = useRef<THREE.PerspectiveCamera>(camera as THREE.PerspectiveCamera);
+  const [enableOrbitControls, setEnableOrbitControls] = useState(false);
 
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
@@ -43,18 +44,49 @@ function SceneContent({
     pcbBaseRef: pcbBaseRef as RefObject<THREE.Group>,
   });
 
+  // Check if section 5 is in view to enable OrbitControls
+  useEffect(() => {
+    const checkSection5 = () => {
+      const section5 = document.querySelector(".section-5");
+      if (!section5) return;
+
+      const rect = section5.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Check if section 5 is in view (at least 50% visible)
+      const isInView = 
+        rect.top < viewportHeight * 0.5 && 
+        rect.bottom > viewportHeight * 0.5;
+      
+      setEnableOrbitControls(isInView);
+    };
+
+    // Check on scroll and resize
+    const handleScroll = () => checkSection5();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+    
+    // Initial check
+    checkSection5();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, []);
+
   return (
     <>
       <OrbitControls
-        enableZoom={true}
-        enablePan={true}
-        enableRotate={true}
+        enableZoom={enableOrbitControls}
+        enablePan={enableOrbitControls}
+        enableRotate={enableOrbitControls}
         minDistance={0.5}
         maxDistance={10}
         target={[0, 0.1, 0.1]}
         onChange={() => {
-          // Log camera position and rotation whenever OrbitControls changes
-          if (camera instanceof THREE.PerspectiveCamera) {
+          // Log camera position and rotation whenever OrbitControls changes (only in section 5)
+          if (enableOrbitControls && camera instanceof THREE.PerspectiveCamera) {
             console.log("=== CAMERA POSITION ===");
             console.log("Camera Position:", {
               x: camera.position.x.toFixed(4),
