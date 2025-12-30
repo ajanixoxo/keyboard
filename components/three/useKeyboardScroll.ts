@@ -213,14 +213,13 @@ export function useKeyboardScroll({
           .to(
             keysRef.current.position,
             {
-              x: 0, y: 0, z: 0.08, duration: 1, ease: "power2.out", // Move closer to camera
+              x: 0, y: 0, z: -0.2, duration: 1, ease: "power2.out", // Move closer to camera (negative z = forward)
             }, 0
           )
-         
           .to(
             keysRef.current.scale,
             {
-              x: 0.065, y: 0.065, z: 0.065, duration: 1, ease: "power2.out", // Scale up more (75% larger)
+              x: 0.03, y: 0.03, z: 0.03, duration: 1, ease: "power2.out", // Scale up slightly (50% larger)
             }, 0
           )
           // Camera moves to desired position for section 2
@@ -271,7 +270,7 @@ export function useKeyboardScroll({
           .to(
             keysRef.current.scale,
             {
-              x: 0.035, y: 0.035, z: 0.035, duration: 1, // Keep keys scaled up
+              x: 0.03, y: 0.03, z: 0.03, duration: 1, // Keep keys scaled up slightly
             }, 0
           )
           .to(
@@ -658,7 +657,117 @@ export function useKeyboardScroll({
             }, 0
           );
 
-        // Section 5: Reassemble
+        // Transition: Section 4 to Section 5 (reassemble everything)
+        const transition4to5 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-5",
+            start: "top bottom", // Start when section 5 enters viewport
+            end: "top top", // Complete when section 5 reaches top
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
+
+        transition4to5
+          // Keys slide back from left and fade in
+          .to(
+            keysRef.current.position,
+            {
+              x: 0, y: 0, z: 0.5, duration: 1, ease: "power2.out", // Return to assembled position
+            }, 0
+          )
+          .to(
+            keysRef.current.rotation,
+            {
+              x: 1.3, y: 0, z: 0, duration: 1, ease: "power2.out", // Return to initial rotation
+            }, 0
+          )
+          .to(
+            keysRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, ease: "power2.out", // Return to initial scale
+            }, 0
+          )
+          .to(
+            keysOpacityProxy,
+            {
+              value: 1, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
+            }, 0
+          )
+          // Inner slide back from right and fade in
+          .to(
+            innerRef.current.position,
+            {
+              x: 0, y: 0, z: 0.5, duration: 1, ease: "power2.out", // Return to assembled position
+            }, 0
+          )
+          .to(
+            innerRef.current.rotation,
+            {
+              x: 1.3, y: 0, z: 0, duration: 1, ease: "power2.out", // Return to initial rotation
+            }, 0
+          )
+          .to(
+            innerRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, ease: "power2.out", // Return to initial scale
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 1, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          // PCB moves back to assembled position
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 0, y: -0.2, z: 0.55, duration: 1, ease: "power2.out", // Return to assembled position
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.rotation,
+            {
+              x: 0.001, y: 0, z: 0, duration: 1, ease: "power2.out", // Return to initial rotation
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, ease: "power2.out", // Return to initial scale
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 1, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          )
+          // Camera returns to initial position
+          .to(
+            camera.current.position,
+            {
+              x: -0.019, y: 2.690, z: 1.624, duration: 1, ease: "power2.out", // Return to initial camera position
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -1.175, y: -0.007, z: -0.016, duration: 1, ease: "power2.out", // Return to initial camera rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0.1, 0.1); // Return to initial lookAt target
+              },
+              duration: 1, ease: "power2.out",
+            }, 0
+          );
+
+        // Section 5: Reassemble (maintain assembled state)
         const section5 = gsap.timeline({
           scrollTrigger: {
             trigger: ".section-5",
@@ -669,84 +778,101 @@ export function useKeyboardScroll({
           },
         });
 
-      section5
-        .to(
-          keysRef.current.position,
-          {
-            y: 0,
-            x: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          innerRef.current.position,
-          {
-            y: 0,
-            x: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          pcbBaseRef.current.position,
-          {
-            y: 0,
-            x: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          camera.current.position,
-          {
-            z: 5,
-            y: 0,
-            x: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          camera.current.rotation,
-          {
-            x: 0,
-            y: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          keysOpacityProxy,
-          {
-            value: 0,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
-          },
-          0.5
-        )
-        .to(
-          innerOpacityProxy,
-          {
-            value: 0,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
-          },
-          0.5
-        )
-        .to(
-          pcbBaseOpacityProxy,
-          {
-            value: 0,
-            duration: 0.5,
-            onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
-          },
-          0.5
-        );
+        // Maintain assembled state
+        section5
+          .to(
+            keysRef.current.position,
+            {
+              x: 0, y: 0, z: 0.5, duration: 1, // Keep keys at assembled position
+            }, 0
+          )
+          .to(
+            keysRef.current.rotation,
+            {
+              x: 1.3, y: 0, z: 0, duration: 1, // Keep keys rotation
+            }, 0
+          )
+          .to(
+            keysRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, // Keep keys scale
+            }, 0
+          )
+          .to(
+            innerRef.current.position,
+            {
+              x: 0, y: 0, z: 0.5, duration: 1, // Keep inner at assembled position
+            }, 0
+          )
+          .to(
+            innerRef.current.rotation,
+            {
+              x: 1.3, y: 0, z: 0, duration: 1, // Keep inner rotation
+            }, 0
+          )
+          .to(
+            innerRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, // Keep inner scale
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 0, y: -0.2, z: 0.55, duration: 1, // Keep PCB at assembled position
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.rotation,
+            {
+              x: 0.001, y: 0, z: 0, duration: 1, // Keep PCB rotation
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, // Keep PCB scale
+            }, 0
+          )
+          .to(
+            camera.current.position,
+            {
+              x: -0.019, y: 2.690, z: 1.624, duration: 1, // Keep camera at initial position
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -1.175, y: -0.007, z: -0.016, duration: 1, // Keep camera rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0.1, 0.1); // Keep looking at initial target
+              },
+              duration: 1,
+            }, 0
+          )
+          .to(
+            keysOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          );
 
         timelineRef.current = section1;
       }, 200); // Small delay to ensure DOM and models are ready
