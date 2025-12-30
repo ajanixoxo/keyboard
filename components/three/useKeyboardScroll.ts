@@ -314,7 +314,87 @@ export function useKeyboardScroll({
             }, 0
           );
 
-        // Section 3: Internal Layout - Exploded Start
+        // Transition: Section 2 to Section 3 (bring back inner and PCB, stack with gaps)
+        const transition2to3 = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-3",
+            start: "top bottom", // Start when section 3 enters viewport
+            end: "top top", // Complete when section 3 reaches top
+            scrub: 1,
+            scroller: scrollContainer,
+          },
+        });
+
+        transition2to3
+          // Inner layer moves back to center and fades in
+          .to(
+            innerRef.current.position,
+            {
+              x: 0, y: 0.3, z: 0.5, duration: 1, ease: "power2.out", // Move to center with gap above
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 1, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          // PCB Base moves back to center and fades in
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 0, y: -0.3, z: 0.55, duration: 1, ease: "power2.out", // Move to center with gap below
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 1, duration: 1, ease: "power2.out", onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          )
+          // Keys move up slightly to create gap and scale down to match other models
+          .to(
+            keysRef.current.position,
+            {
+              x: 0, y: 0.6, z: 0.5, duration: 1, ease: "power2.out", // Move up to create gap
+            }, 0
+          )
+          .to(
+            keysRef.current.rotation,
+            {
+              x: 1.3, y: 0, z: 0, duration: 1, ease: "power2.out", // Keep keys rotation
+            }, 0
+          )
+          .to(
+            keysRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, ease: "power2.out", // Scale down to match inner and PCB
+            }, 0
+          )
+          // Camera adjusts to show all three layers
+          .to(
+            camera.current.position,
+            {
+              x: -0.1158, y: 1.8, z: 3.7654, duration: 1, ease: "power2.out", // Move camera back to see all layers
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -0.3792, y: -0.02293, z: -0.0117, duration: 1, ease: "power2.out", // Keep similar rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0.2, 0.1); // Look at center of stacked layers
+              },
+              duration: 1, ease: "power2.out",
+            }, 0
+          );
+
+        // Section 3: Internal Layout - Stacked with gaps
         const section3 = gsap.timeline({
           scrollTrigger: {
             trigger: ".section-3",
@@ -325,95 +405,101 @@ export function useKeyboardScroll({
           },
         });
 
-      // Gradual separation - starts at section start, completes at midpoint
-      section3
-        .to(
-          keysRef.current.position,
-          {
-            y: 1.5,
-            x: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          innerRef.current.position,
-          {
-            y: 0,
-            x: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          pcbBaseRef.current.position,
-          {
-            y: -1.5,
-            x: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          camera.current.position,
-          {
-            z: 4,
-            y: 0,
-            x: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          camera.current.rotation,
-          {
-            x: -0.15,
-            y: 0,
-            z: 0,
-            duration: 1,
-          },
-          0
-        )
-        .to(
-          keysOpacityProxy,
-          {
-            value: 1,
-            duration: 0.3,
-            onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
-          },
-          0
-        )
-        .to(
-          keysRef.current.scale,
-          {
-            x: 1,
-            y: 1,
-            z: 1,
-            duration: 0.3,
-          },
-          0
-        )
-        .to(
-          innerOpacityProxy,
-          {
-            value: 1,
-            duration: 0.3,
-            onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
-          },
-          0
-        )
-        .to(
-          pcbBaseOpacityProxy,
-          {
-            value: 1,
-            duration: 0.3,
-            onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
-          },
-          0
-        );
+        // Maintain stacked state with gaps
+        section3
+          .to(
+            keysRef.current.position,
+            {
+              x: 0, y: 0.6, z: 0.08, duration: 1, // Keys at top with gap
+            }, 0
+          )
+          .to(
+            keysRef.current.rotation,
+            {
+              x: 2, y: 0, z: 0, duration: 1, // Keep keys rotation
+            }, 0
+          )
+          .to(
+            keysRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, // Keep keys scale matching other models
+            }, 0
+          )
+          .to(
+            innerRef.current.position,
+            {
+              x: 0, y: 0.3, z: 0.5, duration: 1, // Inner in middle with gap
+            }, 0
+          )
+          .to(
+            innerRef.current.rotation,
+            {
+              x: 1.3, y: 0, z: 0, duration: 1, // Keep inner rotation
+            }, 0
+          )
+          .to(
+            innerRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, // Keep inner scale
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.position,
+            {
+              x: 0, y: -0.3, z: 0.55, duration: 1, // PCB at bottom with gap
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.rotation,
+            {
+              x: 0.001, y: 0, z: 0, duration: 1, // Keep PCB rotation
+            }, 0
+          )
+          .to(
+            pcbBaseRef.current.scale,
+            {
+              x: 0.02, y: 0.02, z: 0.02, duration: 1, // Keep PCB scale
+            }, 0
+          )
+          .to(
+            camera.current.position,
+            {
+              x: -0.1158, y: 1.8, z: 3.7654, duration: 1, // Keep camera position
+            }, 0
+          )
+          .to(
+            camera.current.rotation,
+            {
+              x: -0.3792, y: -0.02293, z: -0.0117, duration: 1, // Keep camera rotation
+            }, 0
+          )
+          .to(
+            camera.current,
+            {
+              onUpdate: function() {
+                camera.current!.lookAt(0, 0.2, 0.1); // Keep looking at center
+              },
+              duration: 1,
+            }, 0
+          )
+          .to(
+            keysOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(keysRef.current, keysOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            innerOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(innerRef.current, innerOpacityProxy.value),
+            }, 0
+          )
+          .to(
+            pcbBaseOpacityProxy,
+            {
+              value: 1, duration: 0.1, onUpdate: () => setGroupOpacity(pcbBaseRef.current, pcbBaseOpacityProxy.value),
+            }, 0
+          );
 
         // Section 4: Fully Exploded
         const section4 = gsap.timeline({

@@ -44,8 +44,8 @@ export default function Home() {
           <section className="section-4 min-h-screen flex items-center justify-start px-12">
             <ScrollText
               section={4}
-              title="Every Component Matters"
-              description="Precision-engineered parts working in perfect harmony"
+              title="Backlit Keyboard"
+              description="Illuminated keys for enhanced visibility and ambiance"
               className="text-left items-start"
             />
           </section>
