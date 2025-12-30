@@ -78,7 +78,7 @@ export function ScrollText({
       {description && (
         <p
           ref={descRef}
-          className="text-xl md:text-2xl text-slate-600 max-w-2xl opacity-0"
+          className="text-lg md:text-xl text-slate-600 max-w-2xl opacity-0"
         >
           {description}
         </p>

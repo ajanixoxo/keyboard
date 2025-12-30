@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { KeyboardSceneWrapper } from "@/components/three/KeyboardSceneWrapper";
 import { ScrollText } from "@/components/ui/ScrollText";
 import { PartDescriptions } from "@/components/ui/PartDescriptions";
@@ -7,6 +8,40 @@ import { Navbar } from "@/components/ui/Navbar";
 import { MadeBy } from "@/components/ui/MadeBy";
 
 export default function Home() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    // Handle wheel events anywhere on the page and forward to scroll container
+    const handleWheel = (e: WheelEvent) => {
+      const target = e.target as HTMLElement;
+      
+      // If scrolling over the scroll container, let it handle naturally
+      if (scrollContainer.contains(target)) {
+        return;
+      }
+
+      // If scrolling over the 3D scene or anywhere else, forward to container
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Calculate scroll amount
+      const scrollAmount = e.deltaY;
+      
+      // Apply scroll to container
+      scrollContainer.scrollTop += scrollAmount;
+    };
+
+    // Add wheel event listener to window
+    window.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-screen overflow-hidden bg-linear-to-br from-slate-50 via-gray-50 to-zinc-100">
       <Navbar />
@@ -14,7 +49,10 @@ export default function Home() {
       {/* Split Layout: Left Content, Right 3D Scene */}
       <div className="flex h-full">
         {/* Left Side: Scrollable Content */}
-        <div className="w-2/5 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-linear-to-b from-white/80 to-slate-50/80 backdrop-blur-sm">
+        <div 
+          ref={scrollContainerRef}
+          className="w-2/5 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-linear-to-b from-white/80 to-slate-50/80 backdrop-blur-sm"
+        >
           {/* Section 1: Hero */}
           <section className="section-1 min-h-screen flex items-center justify-start px-12">
             <ScrollText

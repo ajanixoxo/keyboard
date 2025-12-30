@@ -158,7 +158,7 @@ export function KeyboardScene({
         dpr={[1, 2]}
         camera={{ position: [-0.019, 2.690, 1.624], fov: 50 }}
         
-        className="bg-linear-to-br from-slate-100 via-gray-50 to-zinc-100"
+        className=""
       >
         <Suspense fallback={null}>
           <SceneContentWrapper
