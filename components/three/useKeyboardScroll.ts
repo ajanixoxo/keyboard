@@ -77,7 +77,7 @@ export function useKeyboardScroll({
 
         // Set initial model positions to match KeyboardModels.tsx
         if (keysRef.current) {
-          keysRef.current.position.set(0, 0, 0.8);
+          keysRef.current.position.set(0, 0, 0.5);
           keysRef.current.scale.set(0.02, 0.02, 0.02);
           keysRef.current.rotation.set(1.3, 0, 0);
         }
@@ -130,7 +130,7 @@ export function useKeyboardScroll({
           .to(
             keysRef.current.position,
             {
-              x: 0, y: 0, z: 0.8, duration: 0.1,
+              x: 0, y: 0, z: 0.5, duration: 0.1,
             }, 0
           )
           .to(
