@@ -51,26 +51,3 @@ p{
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-/* Loading screen animations */
-@keyframes floatUp {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 0);
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -40px);
-  }
-}
-
-/* Touch optimization */
-.touch-manipulation {
-  touch-action: manipulation;
-}
