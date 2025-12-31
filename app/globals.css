@@ -22,7 +22,16 @@
 body {
   background: #f8fafc;
   color: var(--foreground);
+}
 
+/* Prevent body scrolling on mobile - this allows scroll container to work properly */
+@media (max-width: 1023px) {
+  html, body {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
 }
 
 h1,h2,h3,h4,h5,h6{

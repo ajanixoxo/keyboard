@@ -34,11 +34,85 @@ export default function Home() {
       scrollContainer.scrollTop += scrollAmount;
     };
 
-    // Add wheel event listener to window
+    // Handle touch events on mobile to prevent body scrolling
+    // Only allow scrolling within the scroll container
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let isScrolling = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      
+      // Always allow touch events on interactive elements (links, buttons)
+      if (
+        target.tagName === 'A' ||
+        target.tagName === 'BUTTON' ||
+        target.closest('a') ||
+        target.closest('button')
+      ) {
+        return;
+      }
+
+      // Store initial touch position
+      if (e.touches.length > 0) {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+        isScrolling = false;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      
+      // Always allow touch events on interactive elements
+      if (
+        target.tagName === 'A' ||
+        target.tagName === 'BUTTON' ||
+        target.closest('a') ||
+        target.closest('button')
+      ) {
+        return;
+      }
+
+      // If touch is within scroll container, allow natural scrolling
+      if (scrollContainer.contains(target)) {
+        // Let the scroll container handle it naturally
+        return;
+      }
+
+      // For touches outside scroll container (like on 3D scene), prevent default
+      // This prevents body scrolling while keeping 3D scene interactions
+      if (e.touches.length > 0) {
+        const touchY = e.touches[0].clientY;
+        const touchX = e.touches[0].clientX;
+        const deltaY = Math.abs(touchY - touchStartY);
+        const deltaX = Math.abs(touchX - touchStartX);
+
+        // Only prevent if it's a vertical scroll gesture
+        if (deltaY > deltaX && deltaY > 5) {
+          e.preventDefault();
+          
+          // Forward scroll to container if it's a scroll gesture
+          if (!isScrolling) {
+            isScrolling = true;
+          }
+          
+          const scrollAmount = touchY - touchStartY;
+          scrollContainer.scrollTop -= scrollAmount * 0.8;
+          touchStartY = touchY;
+        }
+      }
+    };
+
+    // Add event listeners
     window.addEventListener("wheel", handleWheel, { passive: false });
+    document.addEventListener("touchstart", handleTouchStart, { passive: true });
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
     };
   }, []);
 
@@ -121,7 +195,7 @@ export default function Home() {
           </section>
         </div>
 
-        {/* Right Side: Fixed 3D Scene */}
+        {/* Right Side: Fixed 3D Scene - stays visible during scroll */}
         <div className="lg:w-3/5 w-full fixed z-30 right-0 top-0 ">
           <KeyboardSceneWrapper />
         </div>
