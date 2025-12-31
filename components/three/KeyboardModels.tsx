@@ -84,7 +84,6 @@ export function KeyboardModels({
 }
 
   // Preload models for better performance
-  useGLTF.preload("/keyboard_full.glb");
   useGLTF.preload("/keyboard_keys.glb");
   useGLTF.preload("/keyboard_inner.glb");
   useGLTF.preload("/keyboard_pcb_base.glb");
