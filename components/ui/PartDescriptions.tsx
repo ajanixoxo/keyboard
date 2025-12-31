@@ -21,11 +21,13 @@ export function PartDescriptions({
   const labelRefs = useRef<(HTMLHeadingElement | null)[]>([]);
 
   useEffect(() => {
+    const containerElement = containerRef.current;
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-            const items = containerRef.current?.querySelectorAll(".part-item");
+            const items = containerElement?.querySelectorAll(".part-item");
             items?.forEach((item, index) => {
               setTimeout(() => {
                 animate(item as HTMLElement, {
@@ -45,14 +47,15 @@ export function PartDescriptions({
       }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    if (containerElement) {
+      observer.observe(containerElement);
     }
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (containerElement) {
+        observer.unobserve(containerElement);
       }
+      observer.disconnect();
     };
   }, []);
 
