@@ -25,6 +25,11 @@ function SceneContent({
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
       cameraRef.current = camera;
+     
+      // Adjust FOV based on screen size - higher FOV on mobile makes model appear smaller
+      const isMobile = window.innerWidth < 1024;
+      cameraRef.current.fov = isMobile ? 100 : 50; // Higher FOV on mobile
+
       // Set camera to desired position from logged values
       camera.position.set(-0.019, 2.690, 1.624);
       camera.rotation.set(-1.175, -0.007, -0.016);
@@ -184,7 +189,7 @@ export function KeyboardScene({
   // GSAP ScrollTrigger handles all scroll animations
 
   return (
-    <div className="w-full h-screen sticky top-0">
+    <div className="w-full h-screen sticky top-0 ">
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}

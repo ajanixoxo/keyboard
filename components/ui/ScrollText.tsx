@@ -70,7 +70,7 @@ export function ScrollText({
     <div className={`flex flex-col ${className}`}>
       <h2
         ref={titleRef}
-        className="text-5xl md:text-7xl font-bold text-slate-900 mb-4 opacity-0"
+        className="text-3xl md:text-7xl font-bold text-slate-900 mb-4 opacity-0"
         style={{ fontFamily: 'var(--font-audiowide)' }}
       >
         {title}
@@ -78,7 +78,7 @@ export function ScrollText({
       {description && (
         <p
           ref={descRef}
-          className="text-lg md:text-xl text-slate-600 max-w-2xl opacity-0"
+          className="text-sm md:text-xl text-slate-600 max-w-2xl opacity-0"
         >
           {description}
         </p>

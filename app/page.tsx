@@ -17,7 +17,7 @@ export default function Home() {
     // Handle wheel events anywhere on the page and forward to scroll container
     const handleWheel = (e: WheelEvent) => {
       const target = e.target as HTMLElement;
-      
+
       // If scrolling over the scroll container, let it handle naturally
       if (scrollContainer.contains(target)) {
         return;
@@ -26,10 +26,10 @@ export default function Home() {
       // If scrolling over the 3D scene or anywhere else, forward to container
       e.preventDefault();
       e.stopPropagation();
-      
+
       // Calculate scroll amount
       const scrollAmount = e.deltaY;
-      
+
       // Apply scroll to container
       scrollContainer.scrollTop += scrollAmount;
     };
@@ -47,14 +47,14 @@ export default function Home() {
       <Navbar />
       <MadeBy />
       {/* Split Layout: Left Content, Right 3D Scene */}
-      <div className="flex h-full">
+      <div className="flex flex-col lg:flex-row h-full">
         {/* Left Side: Scrollable Content */}
-        <div 
+        <div
           ref={scrollContainerRef}
-          className="w-2/5 overflow-y-auto scroll-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-linear-to-b from-white/80 to-slate-50/80 backdrop-blur-sm"
+          className="w-full lg:w-2/5 overflow-y-auto scroll-container mt-20 md:mt-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-linear-to-b relative z-20 backdrop-blur-sm"
         >
           {/* Section 1: Hero */}
-          <section className="section-1 min-h-screen flex items-center justify-start px-12">
+          <section className="section-1 min-h-screen  flex md:items-center justify-start md:px-12 px-5">
             <ScrollText
               section={1}
               title="Mechanical Excellence"
@@ -64,7 +64,7 @@ export default function Home() {
           </section>
 
           {/* Section 2: Keys Focus */}
-          <section className="section-2 min-h-screen flex items-center justify-start px-12">
+          <section className="section-2 min-h-screen  flex md:items-center justify-start md:px-12 px-5">
             <ScrollText
               section={2}
               title="Premium Keycaps"
@@ -74,7 +74,7 @@ export default function Home() {
           </section>
 
           {/* Section 3: Internal Layout - Exploded Start */}
-          <section className="section-3 min-h-screen flex flex-col justify-center px-12 gap-12">
+          <section className="section-3 min-h-screen  flex flex-col justify-center md:px-12 px-5 gap-12">
             <ScrollText
               section={3}
               title="Internal Architecture"
@@ -101,7 +101,7 @@ export default function Home() {
           </section>
 
           {/* Section 4: Fully Exploded */}
-          <section className="section-4 min-h-screen flex items-center justify-start px-12">
+          <section className="section-4 min-h-screen  flex md:items-center justify-start md:px-12 px-5">
             <ScrollText
               section={4}
               title="Backlit Keyboard"
@@ -111,7 +111,7 @@ export default function Home() {
           </section>
 
           {/* Section 5: Reassemble / Finish */}
-          <section className="section-5 min-h-screen flex items-center justify-start px-12">
+          <section className="section-5 min-h-screen  flex md:items-center justify-start md:px-12 px-5">
             <ScrollText
               section={5}
               title="Complete. Refined."
@@ -122,7 +122,7 @@ export default function Home() {
         </div>
 
         {/* Right Side: Fixed 3D Scene */}
-        <div className="w-3/5 fixed right-0 top-0 h-full">
+        <div className="lg:w-3/5 w-full fixed z-30 right-0 top-0 ">
           <KeyboardSceneWrapper />
         </div>
       </div>
